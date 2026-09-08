@@ -3,96 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Glass Calculator</title>
+    <title>Quantum Glass Calculator - GitHub.io</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            user-select: none;
         }
-        /* Custom glassmorphism styling */
         .glass-panel {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
         .dark .glass-panel {
-            background: rgba(17, 24, 39, 0.75);
+            background: rgba(15, 23, 42, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        /* Custom button press tactile effect */
         .calc-btn:active {
-            transform: scale(0.95);
+            transform: scale(0.94);
+        }
+        /* Custom scrollbar for history panel */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.5);
+            border-radius: 4px;
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 min-h-screen flex items-center justify-center p-4 transition-colors duration-500">
+<body class="bg-gradient-to-tr from-violet-600 via-indigo-600 to-pink-500 min-h-screen flex flex-col items-center justify-between p-4 sm:p-6 transition-colors duration-500">
 
-    <div class="w-full max-w-sm glass-panel shadow-2xl rounded-3xl p-6 transition-all duration-300">
-        
-        <!-- Top bar: Theme switcher & Title -->
-        <div class="flex justify-between items-center mb-4">
-            <span class="text-xs font-semibold tracking-wider text-gray-500 dark:text-gray-400 uppercase">Standard Calc</span>
-            <button id="themeToggle" onclick="toggleTheme()" class="p-2 rounded-full hover:bg-gray-200/50 dark:hover:bg-gray-700/50 transition-colors text-gray-700 dark:text-gray-200">
-                <svg id="themeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <header class="w-full max-w-2xl flex justify-between items-center py-2 text-white/90">
+        <div class="flex items-center space-x-2">
+            <svg class="w-6 h-6 text-pink-200 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+            </svg>
+            <span class="font-bold tracking-wider text-sm">QuantumCalc.io</span>
+        </div>
+        <div class="flex items-center space-x-3">
+            <button onclick="toggleHistoryDrawer()" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-xl text-xs font-medium backdrop-blur-md transition-all flex items-center space-x-1 shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span id="historyToggleText">History</span>
+            </button>
+            <button onclick="toggleTheme()" class="p-2 rounded-xl bg-white/20 hover:bg-white/30 text-white backdrop-blur-md transition-all shadow-sm">
+                <svg id="themeIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
                 </svg>
             </button>
         </div>
+    </header>
 
-        <!-- Calculator Screen -->
-        <div class="bg-gray-100/80 dark:bg-gray-900/80 rounded-2xl p-4 mb-6 text-right shadow-inner flex flex-col justify-end min-h-[100px] border border-gray-200/50 dark:border-gray-800">
-            <div id="history" class="text-xs text-gray-500 dark:text-gray-400 font-medium h-5 overflow-x-auto whitespace-nowrap"></div>
-            <div id="display" class="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-gray-100 tracking-tight overflow-x-auto whitespace-nowrap">0</div>
+    <main class="w-full max-w-2xl my-auto grid grid-cols-1 md:grid-cols-4 gap-4">
+        
+        <!-- Calculator Card -->
+        <div id="calculatorCard" class="md:col-span-4 glass-panel shadow-2xl rounded-3xl p-5 sm:p-6 transition-all duration-300">
+            
+            <!-- Mode Selector & Memory Indicator -->
+            <div class="flex justify-between items-center mb-3 text-xs">
+                <div class="flex space-x-2 bg-gray-200/60 dark:bg-gray-800/60 p-1 rounded-xl">
+                    <button onclick="setMode('standard')" id="btnStandard" class="px-3 py-1 rounded-lg font-semibold transition-all bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm">Standard</button>
+                    <button onclick="setMode('scientific')" id="btnScientific" class="px-3 py-1 rounded-lg font-semibold transition-all text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200">Scientific</button>
+                </div>
+                <div id="memoryIndicator" class="hidden text-indigo-600 dark:text-indigo-400 font-bold px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/50">M: <span id="memoryVal">0</span></div>
+            </div>
+
+            <!-- Calculator Display Screen -->
+            <div class="bg-gray-100/90 dark:bg-gray-900/90 rounded-2xl p-4 mb-5 text-right shadow-inner flex flex-col justify-end min-h-[110px] border border-gray-200/50 dark:border-gray-800 overflow-hidden">
+                <div id="historySub" class="text-xs text-gray-500 dark:text-gray-400 font-medium h-5 overflow-x-auto whitespace-nowrap"></div>
+                <div id="display" class="text-3xl sm:text-5xl font-bold text-gray-800 dark:text-gray-100 tracking-tight overflow-x-auto whitespace-nowrap">0</div>
+            </div>
+
+            <!-- Keypad Grid (Standard + Scientific toggleable panel) -->
+            <div class="grid grid-cols-4 gap-2.5 sm:gap-3" id="keypadGrid">
+                <!-- Row 0: Scientific Extras (Hidden by default in standard mode) -->
+                <button onclick="appendFunction('sin')" class="sci-key hidden calc-btn bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 font-medium py-3 rounded-xl transition-all text-sm">sin</button>
+                <button onclick="appendFunction('cos')" class="sci-key hidden calc-btn bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 font-medium py-3 rounded-xl transition-all text-sm">cos</button>
+                <button onclick="appendFunction('tan')" class="sci-key hidden calc-btn bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 font-medium py-3 rounded-xl transition-all text-sm">tan</button>
+                <button onclick="appendFunction('sqrt')" class="sci-key hidden calc-btn bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 font-medium py-3 rounded-xl transition-all text-sm">√</button>
+
+                <button onclick="appendFunction('log')" class="sci-key hidden calc-btn bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 font-medium py-3 rounded-xl transition-all text-sm">log</button>
+                <button onclick="appendFunction('ln')" class="sci-key hidden calc-btn bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 font-medium py-3 rounded-xl transition-all text-sm">ln</button>
+                <button onclick="appendConstant('Math.PI')" class="sci-key hidden calc-btn bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 font-medium py-3 rounded-xl transition-all text-sm">π</button>
+                <button onclick="appendConstant('Math.E')" class="sci-key hidden calc-btn bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 font-medium py-3 rounded-xl transition-all text-sm">e</button>
+
+                <!-- Memory & Utility Row -->
+                <button onclick="memoryClear()" class="calc-btn bg-gray-200/60 dark:bg-gray-800/60 hover:bg-gray-300/60 text-gray-700 dark:text-gray-300 font-semibold py-3 rounded-xl text-xs transition-all">MC</button>
+                <button onclick="memoryRecall()" class="calc-btn bg-gray-200/60 dark:bg-gray-800/60 hover:bg-gray-300/60 text-gray-700 dark:text-gray-300 font-semibold py-3 rounded-xl text-xs transition-all">MR</button>
+                <button onclick="memoryAdd()" class="calc-btn bg-gray-200/60 dark:bg-gray-800/60 hover:bg-gray-300/60 text-gray-700 dark:text-gray-300 font-semibold py-3 rounded-xl text-xs transition-all">M+</button>
+                <button onclick="memorySubtract()" class="calc-btn bg-gray-200/60 dark:bg-gray-800/60 hover:bg-gray-300/60 text-gray-700 dark:text-gray-300 font-semibold py-3 rounded-xl text-xs transition-all">M-</button>
+
+                <!-- Row 1 -->
+                <button onclick="clearAll()" class="calc-btn bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 font-semibold py-3.5 rounded-2xl transition-all">AC</button>
+                <button onclick="deleteDigit()" class="calc-btn bg-gray-200/70 dark:bg-gray-800/70 hover:bg-gray-300/70 text-gray-700 dark:text-gray-200 font-semibold py-3.5 rounded-2xl transition-all">⌫</button>
+                <button onclick="appendOperator('%')" class="calc-btn bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 font-semibold py-3.5 rounded-2xl transition-all">%</button>
+                <button onclick="appendOperator('/')" class="calc-btn bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 font-bold py-3.5 rounded-2xl transition-all">÷</button>
+
+                <!-- Row 2 -->
+                <button onclick="appendNumber('7')" class="calc-btn bg-white/60 dark:bg-gray-800/60 hover:bg-white/90 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold py-3.5 rounded-2xl transition-all shadow-sm">7</button>
+                <button onclick="appendNumber('8')" class="calc-btn bg-white/60 dark:bg-gray-800/60 hover:bg-white/90 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold py-3.5 rounded-2xl transition-all shadow-sm">8</button>
+                <button onclick="appendNumber('9')" class="calc-btn bg-white/60 dark:bg-gray-800/60 hover:bg-white/90 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold py-3.5 rounded-2xl transition-all shadow-sm">9</button>
+                <button onclick="appendOperator('*')" class="calc-btn bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 font-bold py-3.5 rounded-2xl transition-all">×</button>
+
+                <!-- Row 3 -->
+                <button onclick="appendNumber('4')" class="calc-btn bg-white/60 dark:bg-gray-800/60 hover:bg-white/90 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold py-3.5 rounded-2xl transition-all shadow-sm">4</button>
+                <button onclick="appendNumber('5')" class="calc-btn bg-white/60 dark:bg-gray-800/60 hover:bg-white/90 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold py-3.5 rounded-2xl transition-all shadow-sm">5</button>
+                <button onclick="appendNumber('6')" class="calc-btn bg-white/60 dark:bg-gray-800/60 hover:bg-white/90 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold py-3.5 rounded-2xl transition-all shadow-sm">6</button>
+                <button onclick="appendOperator('-')" class="calc-btn bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 font-bold py-3.5 rounded-2xl transition-all">-</button>
+
+                <!-- Row 4 -->
+                <button onclick="appendNumber('1')" class="calc-btn bg-white/60 dark:bg-gray-800/60 hover:bg-white/90 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold py-3.5 rounded-2xl transition-all shadow-sm">1</button>
+                <button onclick="appendNumber('2')" class="calc-btn bg-white/60 dark:bg-gray-800/60 hover:bg-white/90 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold py-3.5 rounded-2xl transition-all shadow-sm">2</button>
+                <button onclick="appendNumber('3')" class="calc-btn bg-white/60 dark:bg-gray-800/60 hover:bg-white/90 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold py-3.5 rounded-2xl transition-all shadow-sm">3</button>
+                <button onclick="appendOperator('+')" class="calc-btn bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 font-bold py-3.5 rounded-2xl transition-all">+</button>
+
+                <!-- Row 5 -->
+                <button onclick="appendNumber('0')" class="calc-btn col-span-2 bg-white/60 dark:bg-gray-800/60 hover:bg-white/90 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold py-3.5 rounded-2xl transition-all shadow-sm">0</button>
+                <button onclick="appendDecimal('.')" class="calc-btn bg-white/60 dark:bg-gray-800/60 hover:bg-white/90 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold py-3.5 rounded-2xl transition-all shadow-sm">.</button>
+                <button onclick="calculateResult()" class="calc-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-2xl transition-all shadow-lg shadow-indigo-500/30">=</button>
+            </div>
         </div>
 
-        <!-- Keypad Grid -->
-        <div class="grid grid-cols-4 gap-3">
-            <!-- Row 1 -->
-            <button onclick="clearAll()" class="calc-btn col-span-2 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 font-semibold py-3.5 rounded-2xl transition-all">AC</button>
-            <button onclick="deleteDigit()" class="calc-btn bg-gray-200/70 dark:bg-gray-800/70 hover:bg-gray-300/70 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 font-semibold py-3.5 rounded-2xl transition-all">⌫</button>
-            <button onclick="appendOperator('/')" class="calc-btn bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 font-bold py-3.5 rounded-2xl transition-all">÷</button>
-
-            <!-- Row 2 -->
-            <button onclick="appendNumber('7')" class="calc-btn bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold py-3.5 rounded-2xl transition-all shadow-sm">7</button>
-            <button onclick="appendNumber('8')" class="calc-btn bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold py-3.5 rounded-2xl transition-all shadow-sm">8</button>
-            <button onclick="appendNumber('9')" class="calc-btn bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold py-3.5 rounded-2xl transition-all shadow-sm">9</button>
-            <button onclick="appendOperator('*')" class="calc-btn bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 font-bold py-3.5 rounded-2xl transition-all">×</button>
-
-            <!-- Row 3 -->
-            <button onclick="appendNumber('4')" class="calc-btn bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold py-3.5 rounded-2xl transition-all shadow-sm">4</button>
-            <button onclick="appendNumber('5')" class="calc-btn bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold py-3.5 rounded-2xl transition-all shadow-sm">5</button>
-            <button onclick="appendNumber('6')" class="calc-btn bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold py-3.5 rounded-2xl transition-all shadow-sm">6</button>
-            <button onclick="appendOperator('-')" class="calc-btn bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 font-bold py-3.5 rounded-2xl transition-all">-</button>
-
-            <!-- Row 4 -->
-            <button onclick="appendNumber('1')" class="calc-btn bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold py-3.5 rounded-2xl transition-all shadow-sm">1</button>
-            <button onclick="appendNumber('2')" class="calc-btn bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold py-3.5 rounded-2xl transition-all shadow-sm">2</button>
-            <button onclick="appendNumber('3')" class="calc-btn bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold py-3.5 rounded-2xl transition-all shadow-sm">3</button>
-            <button onclick="appendOperator('+')" class="calc-btn bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 font-bold py-3.5 rounded-2xl transition-all">+</button>
-
-            <!-- Row 5 -->
-            <button onclick="appendNumber('0')" class="calc-btn col-span-2 bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold py-3.5 rounded-2xl transition-all shadow-sm">0</button>
-            <button onclick="appendDecimal('.')" class="calc-btn bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold py-3.5 rounded-2xl transition-all shadow-sm">.</button>
-            <button onclick="calculateResult()" class="calc-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-2xl transition-all shadow-lg shadow-indigo-500/30">=</button>
+        <!-- History Drawer / Panel (Collapsible or sidebar) -->
+        <div id="historyDrawer" class="hidden md:col-span-4 glass-panel rounded-3xl p-4 flex flex-col max-h-60 overflow-y-auto">
+            <div class="flex justify-between items-center mb-2 pb-1 border-b border-gray-200 dark:border-gray-700">
+                <span class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Calculation History</span>
+                <button onclick="clearHistory()" class="text-xs text-red-500 hover:text-red-700 font-medium">Clear</button>
+            </div>
+            <div id="historyList" class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                <div class="text-xs text-gray-400 italic text-center py-2">No history yet</div>
+            </div>
         </div>
 
-    </div>
+    </main>
+
+    <footer class="w-full max-w-2xl text-center text-xs text-white/70 py-2">
+        Ready for GitHub Pages deployment. Fully responsive & keyboard supported.
+    </footer>
 
     <script>
         let currentInput = '0';
         let historyString = '';
         let resetScreen = false;
+        let memoryValue = 0;
+        let calculationHistory = [];
+        let currentMode = 'standard';
 
         const displayEl = document.getElementById('display');
-        const historyEl = document.getElementById('history');
+        const historySubEl = document.getElementById('historySub');
+        const historyListEl = document.getElementById('historyList');
+        const memoryValEl = document.getElementById('memoryVal');
+        const memoryIndicatorEl = document.getElementById('memoryIndicator');
 
         function updateDisplay() {
             displayEl.textContent = currentInput;
-            historyEl.textContent = historyString;
+            historySubEl.textContent = historyString;
+            // Auto scroll display to right
+            displayEl.scrollLeft = displayEl.scrollWidth;
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            const btnStd = document.getElementById('btnStandard');
+            const btnSci = document.getElementById('btnScientific');
+            const sciKeys = document.querySelectorAll('.sci-key');
+
+            if (mode === 'scientific') {
+                btnSci.className = 'px-3 py-1 rounded-lg font-semibold transition-all bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm';
+                btnStd.className = 'px-3 py-1 rounded-lg font-semibold transition-all text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200';
+                sciKeys.forEach(el => el.classList.remove('hidden'));
+            } else {
+                btnStd.className = 'px-3 py-1 rounded-lg font-semibold transition-all bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm';
+                btnSci.className = 'px-3 py-1 rounded-lg font-semibold transition-all text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200';
+                sciKeys.forEach(el => el.classList.add('hidden'));
+            }
         }
 
         function appendNumber(num) {
@@ -110,7 +216,7 @@
                 currentInput = '0';
                 resetScreen = false;
             }
-            const parts = currentInput.split(/[\+\-\*\/]/);
+            const parts = currentInput.split(/[\+\-\*\/\%\(\)]/);
             const lastPart = parts[parts.length - 1];
             if (!lastPart.includes('.')) {
                 currentInput += dot;
@@ -123,10 +229,32 @@
                 resetScreen = false;
             }
             const lastChar = currentInput.slice(-1);
-            if (['+', '-', '*', '/'].includes(lastChar)) {
+            if (['+', '-', '*', '/', '%'].includes(lastChar)) {
                 currentInput = currentInput.slice(0, -1) + op;
             } else {
                 currentInput += op;
+            }
+            updateDisplay();
+        }
+
+        function appendFunction(func) {
+            if (resetScreen) {
+                resetScreen = false;
+            }
+            if (currentInput === '0') {
+                currentInput = func + '(';
+            } else {
+                currentInput += func + '(';
+            }
+            updateDisplay();
+        }
+
+        function appendConstant(constant) {
+            if (currentInput === '0' || resetScreen) {
+                currentInput = constant;
+                resetScreen = false;
+            } else {
+                currentInput += constant;
             }
             updateDisplay();
         }
@@ -139,29 +267,42 @@
         }
 
         function deleteDigit() {
-            if (currentInput.length > 1) {
+            if (currentInput.length > 1 && !resetScreen) {
                 currentInput = currentInput.slice(0, -1);
             } else {
                 currentInput = '0';
+                resetScreen = false;
             }
             updateDisplay();
         }
 
         function calculateResult() {
             try {
-                // Safe evaluation replacement for standard calc
-                let sanitized = currentInput.replace(/×/g, '*').replace(/÷/g, '/');
+                let sanitized = currentInput
+                    .replace(/×/g, '*')
+                    .replace(/÷/g, '/')
+                    .replace(/sin\(/g, 'Math.sin(')
+                    .replace(/cos\(/g, 'Math.cos(')
+                    .replace(/tan\(/g, 'Math.tan(')
+                    .replace(/sqrt\(/g, 'Math.sqrt(')
+                    .replace(/log\(/g, 'Math.log10(')
+                    .replace(/ln\(/g, 'Math.log(');
+
                 historyString = currentInput + ' =';
                 
-                // Evaluate expression safely using Function wrapper
+                // Evaluate expression securely using Function sandbox
                 let result = Function('"use strict";return (' + sanitized + ')')();
                 
                 if (!isFinite(result)) {
                     throw new Error("Math Error");
                 }
                 
-                // Format decimal output to avoid floating point anomalies
-                currentInput = parseFloat(result.toFixed(8)).toString();
+                let formattedResult = parseFloat(result.toFixed(8)).toString();
+                
+                // Add to history list
+                addToHistory(historyString + ' ' + formattedResult);
+
+                currentInput = formattedResult;
                 resetScreen = true;
                 updateDisplay();
             } catch (error) {
@@ -169,6 +310,68 @@
                 resetScreen = true;
                 updateDisplay();
             }
+        }
+
+        function addToHistory(entry) {
+            calculationHistory.unshift(entry);
+            if (calculationHistory.length > 15) calculationHistory.pop();
+            renderHistory();
+        }
+
+        function renderHistory() {
+            if (calculationHistory.length === 0) {
+                historyListEl.innerHTML = '<div class="text-xs text-gray-400 italic text-center py-2">No history yet</div>';
+                return;
+            }
+            historyListEl.innerHTML = calculationHistory.map(item => `
+                <div class="flex justify-between items-center bg-white/40 dark:bg-gray-800/40 px-3 py-1.5 rounded-xl text-xs">
+                    <span class="font-mono text-gray-700 dark:text-gray-200">${item}</span>
+                </div>
+            `).join('');
+        }
+
+        function clearHistory() {
+            calculationHistory = [];
+            renderHistory();
+        }
+
+        function toggleHistoryDrawer() {
+            const drawer = document.getElementById('historyDrawer');
+            drawer.classList.toggle('hidden');
+        }
+
+        // Memory functions
+        function memoryClear() {
+            memoryValue = 0;
+            memoryIndicatorEl.classList.add('hidden');
+        }
+
+        function memoryRecall() {
+            currentInput = memoryValue.toString();
+            resetScreen = true;
+            updateDisplay();
+        }
+
+        function memoryAdd() {
+            try {
+                let val = parseFloat(Function('"use strict";return (' + currentInput + ')')());
+                if (!isNaN(val)) {
+                    memoryValue += val;
+                    memoryValEl.textContent = memoryValue;
+                    memoryIndicatorEl.classList.remove('hidden');
+                }
+            } catch (e) {}
+        }
+
+        function memorySubtract() {
+            try {
+                let val = parseFloat(Function('"use strict";return (' + currentInput + ')')());
+                if (!isNaN(val)) {
+                    memoryValue -= val;
+                    memoryValEl.textContent = memoryValue;
+                    memoryIndicatorEl.classList.remove('hidden');
+                }
+            } catch (e) {}
         }
 
         function toggleTheme() {
@@ -183,11 +386,15 @@
             }
         }
 
-        // Optional keyboard support
+        // Keyboard navigation listener
         window.addEventListener('keydown', (e) => {
-            if ((e.key >= '0' && e.key <= '9')) appendNumber(e.key);
+            if (e.key >= '0' && e.key <= '9') appendNumber(e.key);
             if (e.key === '.') appendDecimal('.');
-            if (e.key === '+' || e.key === '-' || e.key === '*' || e.key === '/') appendOperator(e.key);
+            if (e.key === '+') appendOperator('+');
+            if (e.key === '-') appendOperator('-');
+            if (e.key === '*') appendOperator('*');
+            if (e.key === '/') appendOperator('/');
+            if (e.key === '%') appendOperator('%');
             if (e.key === 'Enter' || e.key === '=') calculateResult();
             if (e.key === 'Backspace') deleteDigit();
             if (e.key === 'Escape') clearAll();
